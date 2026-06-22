@@ -44,19 +44,19 @@ KeyMood is not a keylogger and not a chat-based mood app. It treats typing force
 
 Apple does not publish a full public AppleSPU accelerometer compatibility matrix for third-party apps. This target list is based on Apple's current motion-sensor feature boundary for Mac laptops and teardown evidence for the M2 MacBook Air.
 
-| Status | MacBook models |
+| Support | MacBook models |
 |---|---|
-| Confirmed hardware evidence | MacBook Air 13-inch (M2, 2022) |
-| Expected target | MacBook Air 13-inch/15-inch (M2, 2022-2023) |
-| Expected target | MacBook Air 13-inch/15-inch (M3, 2024) |
-| Expected target | MacBook Air 13-inch/15-inch (M4, 2025) |
-| Expected target | MacBook Pro 13-inch (M2, 2022) |
-| Expected target | MacBook Pro 14-inch/16-inch (M1 Pro/M1 Max, 2021) |
-| Expected target | MacBook Pro 14-inch/16-inch (M2 Pro/M2 Max, 2023) |
-| Expected target | MacBook Pro 14-inch/16-inch (M3/M3 Pro/M3 Max, 2023-2024) |
-| Expected target | MacBook Pro 14-inch/16-inch (M4/M4 Pro/M4 Max, 2024-2025) |
-| Not a target | Desktop Macs: iMac, Mac mini, Mac Studio, Mac Pro |
-| Not a target | MacBook Air (M1, 2020), 13-inch MacBook Pro (M1, 2020), MacBook Neo, and earlier Mac laptops |
+| Possible | MacBook Air 13-inch (M2, 2022) |
+| Possible | MacBook Air 13-inch/15-inch (M2, 2022-2023) |
+| Possible | MacBook Air 13-inch/15-inch (M3, 2024) |
+| Possible | MacBook Air 13-inch/15-inch (M4, 2025) |
+| Possible | MacBook Pro 13-inch (M2, 2022) |
+| Possible | MacBook Pro 14-inch/16-inch (M1 Pro/M1 Max, 2021) |
+| Possible | MacBook Pro 14-inch/16-inch (M2 Pro/M2 Max, 2023) |
+| Possible | MacBook Pro 14-inch/16-inch (M3/M3 Pro/M3 Max, 2023-2024) |
+| Possible | MacBook Pro 14-inch/16-inch (M4/M4 Pro/M4 Max, 2024-2025) |
+| Not possible | Desktop Macs: iMac, Mac mini, Mac Studio, Mac Pro |
+| Not possible | MacBook Air (M1, 2020), 13-inch MacBook Pro (M1, 2020), MacBook Neo, and earlier Mac laptops |
 
 References:
 
@@ -127,6 +127,8 @@ In practice, this means `Full Ahead` requires sustained high energy rather than 
 | `charged` | `Half Ahead` | Faster, more energetic |
 | `intense` | `Full Ahead` | Maximum shake and motion |
 | `relaxing` | `Standby` | Cooling down |
+
+`Sensitivity` controls how easily the same physical typing force reaches each regime. Lower sensitivity requires firmer typing before KeyMood climbs into `Half Ahead` or `Full Ahead`; higher sensitivity lets lighter keyboard impact produce stronger motion. The slider scales the local `energy` estimate before threshold and dwell logic, so it changes responsiveness without reading typed text or key events.
 
 The first companion direction is a tiny white submarine/engine pet. Stronger regimes increase propeller speed, body motion, smoke, splash, and eye intensity. Character assets live in `docs/assets/character/`.
 
