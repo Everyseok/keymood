@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 56" role="img" aria-label="KeyMood Dead Slow submarine pet">
+  <defs>
+    <mask id="eye-cutouts">
+      <rect width="96" height="56" fill="white"/>
+      <circle cx="67.5" cy="34" r="4.0" fill="black"/>
+      <circle cx="78.5" cy="34" r="4.0" fill="black"/>
+    </mask>
+    <style>
+      .white { fill: #fff; }
+      .pet { animation: dead-slow-bob 3.8s ease-in-out infinite; transform-origin: 54px 35px; }
+      .propeller { animation: dead-slow-spin 2.8s linear infinite; transform-origin: 17px 36px; }
+      .smoke_puffs { animation: dead-slow-smoke 4.6s ease-in-out infinite; transform-origin: 45px 10px; }
+      @keyframes dead-slow-bob {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(1px); }
+      }
+      @keyframes dead-slow-spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes dead-slow-smoke {
+        0%, 70%, 100% { opacity: .15; transform: translateY(0) scale(.9); }
+        82% { opacity: 1; transform: translateY(-1px) scale(1); }
+      }
+    </style>
+  </defs>
+  <g class="smoke_puffs white">
+    <circle cx="42" cy="9" r="3.8"/>
+  </g>
+  <g class="pet">
+    <g class="propeller white">
+      <ellipse cx="17" cy="28.5" rx="4.2" ry="8.6"/>
+      <ellipse cx="17" cy="43.5" rx="4.2" ry="8.6"/>
+    </g>
+    <rect class="propeller_mount white" x="22" y="32" width="9" height="8" rx="1.5"/>
+    <path class="body white" mask="url(#eye-cutouts)" d="M30 36c1.7-10.3 10-14.6 24-14.6h15.5C81 21.4 89 28 89 36.2 89 44 81.2 50 69.5 50H43.8C35.5 50 29.4 44 30 36z"/>
+    <path class="underside_fin white" d="M43 47c-2.4 4.2-7.1 5.8-10.4 4.2-2.4-1.2-1.5-4.5 1.8-6.8l11.5-4.5c.2 3.2-.7 5.4-2.9 7.1z"/>
+    <rect class="chimney white" x="50" y="13" width="8" height="11" rx="2"/>
+    <rect class="chimney_cap white" x="47" y="11" width="17" height="5" rx="2.5"/>
+    <circle class="eye_left_highlight white" cx="69.8" cy="32.2" r="1.55"/>
+    <circle class="eye_right_highlight white" cx="80.8" cy="32.2" r="1.55"/>
+  </g>
+</svg>

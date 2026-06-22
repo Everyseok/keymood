@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 56" role="img" aria-label="KeyMood Full Ahead submarine pet">
+  <defs>
+    <mask id="eye-cutouts">
+      <rect width="96" height="56" fill="white"/>
+      <path d="M62.7 33.7l9.5-2.9v4.9h-8.9z" fill="black"/>
+      <path d="M83.3 33.7l-9.5-2.9v4.9h8.9z" fill="black"/>
+    </mask>
+    <style>
+      .white { fill: #fff; }
+      .flame_red { fill: #ff3b30; }
+      .pet { animation: full-ahead-overdrive .42s steps(2, end) infinite; transform-origin: 54px 35px; }
+      .propeller { animation: full-ahead-spin .16s linear infinite; transform-origin: 17px 36px; }
+      .smoke_puffs { animation: full-ahead-smoke .52s ease-in-out infinite; transform-origin: 49px 10px; }
+      .eye_flames { animation: full-ahead-flame .26s steps(2, end) infinite; transform-origin: 73px 33px; }
+      .eye_sparks { animation: full-ahead-sparks .34s ease-in-out infinite; transform-origin: 73px 29px; }
+      @keyframes full-ahead-overdrive {
+        0% { transform: translate(-1px, -1px) rotate(-7deg); }
+        50% { transform: translate(2px, 2px) rotate(-3deg); }
+        100% { transform: translate(0, -2px) rotate(-8deg); }
+      }
+      @keyframes full-ahead-spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes full-ahead-smoke {
+        0%, 100% { opacity: .85; transform: translateY(0) scale(1); }
+        50% { opacity: 1; transform: translateY(-2px) scale(1.08); }
+      }
+      @keyframes full-ahead-flame {
+        0% { transform: translate(-.4px, -.4px) scale(1.02); opacity: 1; }
+        50% { transform: translate(.5px, .3px) scale(1.15); opacity: .9; }
+        100% { transform: translate(0, -.5px) scale(1.08); opacity: 1; }
+      }
+      @keyframes full-ahead-sparks {
+        0%, 100% { opacity: .45; transform: translateY(0); }
+        50% { opacity: 1; transform: translateY(-1px); }
+      }
+    </style>
+  </defs>
+  <g class="wake_marks white">
+    <ellipse cx="5.5" cy="40.5" rx="3.5" ry="1.2"/>
+    <ellipse cx="11" cy="46" rx="3.1" ry="1.15"/>
+    <ellipse cx="17" cy="50" rx="2" ry=".95"/>
+  </g>
+  <g class="smoke_puffs white">
+    <circle cx="38.5" cy="8.4" r="4"/>
+    <circle cx="45" cy="11.4" r="3.9"/>
+    <circle cx="51" cy="7.4" r="3.2"/>
+    <circle cx="55.5" cy="11.8" r="2.6"/>
+  </g>
+  <g class="pet">
+    <g class="propeller white">
+      <ellipse cx="17" cy="27" rx="4.4" ry="9.8"/>
+      <ellipse cx="17" cy="45" rx="4.4" ry="9.8"/>
+    </g>
+    <rect class="propeller_mount white" x="22" y="32" width="9" height="8" rx="1.5"/>
+    <path class="body white" mask="url(#eye-cutouts)" d="M30 36c1.7-10.3 10-14.6 24-14.6h15.5C81 21.4 89 28 89 36.2 89 44 81.2 50 69.5 50H43.8C35.5 50 29.4 44 30 36z"/>
+    <path class="underside_fin white" d="M43 47c-2.4 4.2-7.1 5.8-10.4 4.2-2.4-1.2-1.5-4.5 1.8-6.8l11.5-4.5c.2 3.2-.7 5.4-2.9 7.1z"/>
+    <rect class="chimney white" x="50" y="13" width="8" height="11" rx="2"/>
+    <rect class="chimney_cap white" x="47" y="11" width="17" height="5" rx="2.5"/>
+    <g class="eye_flames flame_red">
+      <path d="M62.1 34.7c1.2-5.2 4.1-8.1 8.9-9.8-1.1 2.7-.3 4.8 2.2 7.2-3.1-.8-6.1-.1-11.1 2.6z"/>
+      <path d="M83.9 34.7c-1.2-5.2-4.1-8.1-8.9-9.8 1.1 2.7.3 4.8-2.2 7.2 3.1-.8 6.1-.1 11.1 2.6z"/>
+    </g>
+    <g class="eye_sparks flame_red">
+      <circle cx="66.5" cy="28.4" r="0.9"/>
+      <circle cx="79.5" cy="28.4" r="0.9"/>
+      <circle cx="73" cy="26.9" r="0.7"/>
+    </g>
+    <circle class="eye_left_highlight white" cx="70.0" cy="32.1" r="1.0"/>
+    <circle class="eye_right_highlight white" cx="79.0" cy="32.1" r="1.0"/>
+  </g>
+</svg>
