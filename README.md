@@ -92,17 +92,29 @@ If a MacBook does not expose usable raw sensor reports, KeyMood still launches a
 | Menu-bar output | Animated companion regime |
 | Privacy boundary | No typed text, key names, key codes, prompts, or cloud calls |
 
-```mermaid
-flowchart TD
-  KEY["typing force"] --> BODY["MacBook chassis motion"]
-  BODY --> SPU["AppleSPU accelerometer reports"]
-  SPU --> IMPACT["impact-g extraction"]
-  IMPACT --> ENERGY["energy smoothing"]
-  ENERGY --> TUNE["sensitivity scaling"]
-  TUNE --> DWELL["threshold + dwell gate"]
-  DWELL --> REGIME["engine-telegraph regime"]
-  REGIME --> ICON["menu-bar companion animation"]
+### Signal Model
+
+KeyMood models typing force as a local vibration proxy, not as semantic input.
+
+Let `a_t = (x_t, y_t, z_t)` be the local accelerometer vector reported at time `t`. A keystroke produces a small impulse through the keyboard deck and chassis, so KeyMood estimates instantaneous typing impact from the frame-to-frame acceleration delta:
+
+```text
+impact_g(t) = || a_t - a_{t-1} ||_2
 ```
+
+Because a single spike may come from desk movement, hand repositioning, or sensor noise, the app does not map `impact_g` directly to a character state. It first computes a smoothed energy estimate:
+
+```text
+energy(t) = alpha * energy_{t-1} + (1 - alpha) * normalize(impact_g(t), sensitivity)
+```
+
+The visible regime is then selected by a finite-state controller:
+
+```text
+regime(t) = FSM(energy(t), thresholds, dwell_time, relaxation_decay)
+```
+
+In practice, this means `Full Ahead` requires sustained high energy rather than one accidental bump, and falling energy enters `Standby` before returning to `Dead Slow`. The character therefore behaves like a physical companion responding to force over time, while the privacy boundary stays narrow: only motion deltas are observed.
 
 ---
 
