@@ -147,12 +147,12 @@ sudo .build/debug/keymood-probe raw-stream --seconds 15
 
 ## License
 
-KeyMood is released under the BSD 3-Clause License.
+KeyMood is released under the Apache License 2.0.
 
-Commercial use is permitted, but redistributions must retain the copyright notice and license terms:
+Commercial use is permitted, but redistributions must retain the license terms and the attribution notice:
 
 ```text
-Copyright (c) 2026, junseokism
+Copyright 2026 junseokism
 ```
 
-See [LICENSE](LICENSE) for the full terms.
+See [LICENSE](LICENSE) and [NOTICE](NOTICE) for the full terms and attribution notice.

@@ -7,6 +7,8 @@ APP_DIR="${1:-$ROOT_DIR/output/$APP_NAME.app}"
 ZIP_PATH="${APP_DIR%/*}/$APP_NAME.zip"
 INFO_PLIST="$APP_DIR/Contents/Info.plist"
 EXECUTABLE="$APP_DIR/Contents/MacOS/$APP_NAME"
+LICENSE_FILE="$APP_DIR/Contents/Resources/LICENSE"
+NOTICE_FILE="$APP_DIR/Contents/Resources/NOTICE"
 
 if [[ ! -d "$APP_DIR" ]]; then
   echo "Missing app bundle: $APP_DIR" >&2
@@ -20,6 +22,16 @@ fi
 
 if [[ ! -f "$INFO_PLIST" ]]; then
   echo "Missing Info.plist: $INFO_PLIST" >&2
+  exit 1
+fi
+
+if [[ ! -f "$LICENSE_FILE" ]]; then
+  echo "Missing bundled license: $LICENSE_FILE" >&2
+  exit 1
+fi
+
+if [[ ! -f "$NOTICE_FILE" ]]; then
+  echo "Missing bundled notice: $NOTICE_FILE" >&2
   exit 1
 fi
 
