@@ -1,63 +1,145 @@
 # KeyMood
 
-KeyMood is a local-first macOS experiment that turns typing dynamics into a small menu-bar mood companion.
+<p align="center">
+  <img src="docs/assets/character/preview.svg" alt="KeyMood menu bar companion preview" width="44%" />
+</p>
 
-## Distribution Status
+<p align="center">
+  <strong>A tiny macOS menu-bar character that reacts to how hard you type.</strong><br />
+  KeyMood turns local MacBook motion-sensor energy into a live companion state.
+</p>
 
-KeyMood is currently an experimental alpha for local testing and developer-to-developer GitHub releases. It is intended for MacBooks with AppleSPU motion-sensor access. Desktop Macs and unsupported MacBook models may show `No Sensor` even when the app launches correctly.
+<p align="center">
+  No typed text. No key logging. No cloud model. No Python backend.
+</p>
 
-Release archives built by the default script are ad-hoc signed for local testing. Public macOS distribution should use a Developer ID Application certificate and Apple notarization.
+---
 
-The first milestone was the raw sensor probe that answers one question:
+## Menu Bar Preview
 
-> Can this MacBook expose enough motion signal to detect typing force without reading typed text?
+<p align="center">
+  <img src="docs/assets/readme/keymood-preview.gif" alt="KeyMood menu bar preview" width="62%" />
+</p>
 
-## Probe
+---
 
-List HID/SPU sensor candidates:
+## What It Does
 
-```bash
-swift run keymood-probe sensors
+| Physical input | Local processing | Menu-bar output |
+|---|---|---|
+| MacBook body vibration from typing | AppleSPU accelerometer samples -> impact-g -> smoothed energy | A small animated character changes regime |
+| Softer typing | Low energy, short spikes ignored | `Dead Slow` or `Slow Ahead` |
+| Firmer typing | Higher sustained energy after dwell filtering | `Half Ahead` or `Full Ahead` |
+| Typing settles down | Relax path with decay instead of instant reset | `Standby` |
+
+KeyMood does not infer emotion from what you type. It uses how the MacBook physically moves while you type, then maps that motion into a menu-bar companion state.
+
+---
+
+## Supported MacBooks
+
+Apple does not publish a full public AppleSPU accelerometer compatibility matrix for third-party apps. KeyMood's target list is based on Apple's current motion-sensor feature boundary for Mac laptops and teardown evidence for the M2 MacBook Air.
+
+| Status | MacBook models |
+|---|---|
+| Confirmed hardware evidence | MacBook Air 13-inch (M2, 2022) |
+| Expected target | MacBook Air 13-inch/15-inch (M2, 2022-2023) |
+| Expected target | MacBook Air 13-inch/15-inch (M3, 2024) |
+| Expected target | MacBook Air 13-inch/15-inch (M4, 2025) |
+| Expected target | MacBook Pro 13-inch (M2, 2022) |
+| Expected target | MacBook Pro 14-inch/16-inch (M1 Pro/M1 Max, 2021) |
+| Expected target | MacBook Pro 14-inch/16-inch (M2 Pro/M2 Max, 2023) |
+| Expected target | MacBook Pro 14-inch/16-inch (M3/M3 Pro/M3 Max, 2023-2024) |
+| Expected target | MacBook Pro 14-inch/16-inch (M4/M4 Pro/M4 Max, 2024-2025) |
+| Not a target | Desktop Macs: iMac, Mac mini, Mac Studio, Mac Pro |
+| Not a target | MacBook Air (M1, 2020), 13-inch MacBook Pro (M1, 2020), MacBook Neo, and earlier Mac laptops |
+
+References:
+
+- Apple says Vehicle Motion Cues are available on Mac laptop computers, but not on MacBook Neo, MacBook Air (M1), 13-inch MacBook Pro (M1), or earlier models: [Apple Support](https://support.apple.com/guide/mac-help/customize-onscreen-motion-mchlc03f57a1/mac).
+- iFixit identified a Bosch Sensortec 6-axis accelerometer/gyroscope in the M2 MacBook Air logic board: [iFixit teardown](https://www.ifixit.com/News/62674/m2-macbook-air-teardown-apple-forgot-the-heatsink).
+
+If a model does not expose usable raw sensor reports to KeyMood, the app still launches and shows `No Sensor`.
+
+---
+
+## Signal Logic
+
+KeyMood treats typing force as a chassis-motion signal.
+
+When a key is pressed, the force travels through the keyboard deck and produces a small impulse in the MacBook body. On supported models, the local motion sensor reports high-rate acceleration samples. KeyMood does not need the key name, typed character, focused app, or text content.
+
+The runtime reduces raw motion into a compact signal:
+
+```text
+a(t)        = raw local acceleration vector
+impact_g   = ||a(t) - a(t - 1)||
+energy(t)  = smoothed normalized impact over a short time window
+regime(t)  = threshold + dwell + relaxation state machine
 ```
 
-Stream AppleSPU raw accelerometer impact energy for 15 seconds:
+The important part is the dwell filter. A single desk bump should not instantly become `Full Ahead`. The high-energy target must remain active long enough before the visible character commits to the stronger regime. When the signal drops, KeyMood enters `Standby` and relaxes down instead of snapping back.
+
+| Stage | Purpose |
+|---|---|
+| Raw AppleSPU reports | Read only local accelerometer motion |
+| Impact-g extraction | Convert frame-to-frame acceleration delta into physical typing impulse |
+| Energy smoothing | Separate sustained typing force from one-frame noise |
+| Sensitivity scaling | Let each MacBook/user tune the same signal path |
+| Dwell gate | Require sustained force before stronger states appear |
+| Relax path | Let the character cool down naturally after intense typing |
+
+---
+
+## Quick Start
+
+Current release artifact size is small:
+
+| Artifact | Local size |
+|---|---:|
+| `output/KeyMood.app` | about 380 KB |
+| `output/KeyMood.zip` | about 104 KB |
+
+Run from source:
 
 ```bash
-swift run keymood-probe raw-stream --seconds 15
+git clone https://github.com/Everyseok/keymood.git && cd keymood && swift run keymood-menubar
 ```
 
-Convert the signal into a stable runtime mood:
+Build and open the local app bundle:
 
 ```bash
-swift run keymood-probe mood-stream --seconds 30 --dwell 1.0
+git clone https://github.com/Everyseok/keymood.git && cd keymood && ./scripts/build_app_bundle.sh && open output/KeyMood.app
 ```
 
-`mood-stream` separates raw signal from character pose. Short spikes can become `Half Ahead`, but `Full Ahead` only commits after the high-impact target stays active for the dwell window. When the signal drops, the visible pose settles into `Standby` instead of snapping back to `Dead Slow`.
+Requirements:
 
-The legacy generic HID stream is still available for comparison:
+| Requirement | Version / note |
+|---|---|
+| macOS | 14 or newer |
+| Swift | Swift 6 toolchain / Xcode Command Line Tools |
+| Hardware | Supported MacBook with usable AppleSPU motion reports |
+| Network | Only needed for `git clone` |
 
-```bash
-swift run keymood-probe stream --seconds 15
-```
+---
 
-Run the local menu bar app:
+## Menu Bar Runtime
 
-```bash
-swift run keymood-menubar
-```
+The app lives in the macOS menu bar. The menu-bar item is the selected character only; status text stays inside the menu.
 
-The menu bar app shows an animated character icon. It does not display typed text, key names, or key codes. Click the icon to open the native macOS menu with a read-only regime rail, character selection, the current regime, sensitivity slider, Roaming Mode switch, pause/resume, and quit actions. Roaming Mode makes the selected character travel to each edge of its menu bar track before reversing direction.
+Current menu:
 
-## Sensitivity
+| Control | Behavior |
+|---|---|
+| Regime rail | Shows `Dead Slow -> Slow Ahead -> Half Ahead -> Full Ahead -> Standby` and highlights the current regime |
+| Character | Switches between available companion styles |
+| Current | Shows the active user-facing regime |
+| Sensitivity | Adjusts how strongly motion energy affects regime changes |
+| Roaming Mode | Lets the character travel across its menu-bar track |
+| Pause / Resume | Temporarily freezes sensor-driven updates |
+| Quit KeyMood | Exits the app |
 
-The menu includes a `Sensitivity` slider from 0 to 100. It scales the local motion signal before the mood state machine classifies the current regime.
-
-- Lower values make KeyMood calmer and reduce accidental jumps into `Half Ahead` or `Full Ahead`.
-- Higher values make KeyMood react to lighter typing and smaller desk vibrations.
-- The slider does not read typed text, key names, key codes, or app content.
-- There is no required first-run calibration flow in the MVP. If the character feels too quiet or too intense on a supported MacBook, adjust `Sensitivity` from the menu.
-
-Runtime naming is split on purpose. The internal state machine keeps compact semantic cases for code stability, while all user-facing output uses engine-telegraph labels:
+Runtime naming is split on purpose. Code keeps compact semantic states; the UI uses engine-telegraph language:
 
 | Internal state | User-facing regime |
 |---|---|
@@ -67,69 +149,41 @@ Runtime naming is split on purpose. The internal state machine keeps compact sem
 | `intense` | `Full Ahead` |
 | `relaxing` | `Standby` |
 
-First character direction:
+---
 
-![KeyMood submarine companion preview](docs/assets/character/preview.svg)
+## Character System
 
-The transparent SVG state assets live in `docs/assets/character/`: mostly white body parts, with red eye-flame accents for `Half Ahead` and `Full Ahead`. See `docs/character-design.md`.
+The first companion direction is a tiny white submarine/engine pet. Stronger regimes increase propeller speed, body motion, smoke, splash, and eye intensity.
 
-Build a local app bundle for a GitHub release artifact:
+The character assets live in `docs/assets/character/`. See `docs/character-design.md` for the regime-by-regime visual contract.
 
-```bash
-./scripts/build_app_bundle.sh
-```
+---
 
-The script creates `output/KeyMood.app` and `output/KeyMood.zip`. The bundle is ad-hoc signed for local testing. Public macOS distribution should use Developer ID signing and notarization.
+## Probe Tools
 
-Run the release smoke test after building:
+List HID/SPU sensor candidates:
 
 ```bash
-./scripts/smoke_app_bundle.sh
+swift run keymood-probe sensors
 ```
 
-Developer ID signing and notarization are optional build-script paths that require local Apple credentials:
+Stream AppleSPU raw accelerometer impact energy:
 
 ```bash
-KEYMOOD_SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" \
-KEYMOOD_NOTARIZE=1 \
-KEYMOOD_NOTARY_PROFILE="keymood-notary" \
-./scripts/build_app_bundle.sh
+swift run keymood-probe raw-stream --seconds 15
 ```
 
-Check whether this Mac is ready for Developer ID distribution:
+Convert the signal into stable runtime regimes:
 
 ```bash
-./scripts/check_distribution_readiness.sh
+swift run keymood-probe mood-stream --seconds 30 --dwell 1.0
 ```
 
-Create the notary keychain profile before using the notarization path:
-
-```bash
-./scripts/store_notary_profile.sh
-```
-
-Apple account setup that cannot be automated by the repository:
-
-1. Enroll in the Apple Developer Program.
-2. Create or install a `Developer ID Application` certificate in your login keychain.
-3. Store notarization credentials in the local keychain with `./scripts/store_notary_profile.sh`.
-4. Rerun `./scripts/check_distribution_readiness.sh`.
-
-Known release limitations:
-
-- AppleSPU raw sensor access is not a public App Store API.
-- KeyMood targets supported MacBooks; desktop Macs are not expected to provide the required AppleSPU typing-motion signal.
-- Sensor availability can still vary by MacBook model, macOS version, and local permissions.
-- If raw sensor access fails, the menu bar app falls back to `No Sensor`.
-- The MVP relies on the menu `Sensitivity` slider rather than a required calibration flow.
-
-Run guided soft-vs-firm typing calibration with a graph:
+Run guided soft-vs-firm typing calibration:
 
 ```bash
 swift run keymood-probe calibrate --rounds 2 --repeats 3
 ```
-
-When prompted, type the shown phrase softly or firmly and press Enter after each line. The probe discards the content and reports aggregate accelerometer impact energy.
 
 If macOS blocks raw sensor access, build once and run the compiled probe with sudo:
 
@@ -138,12 +192,69 @@ swift build
 sudo .build/debug/keymood-probe raw-stream --seconds 15
 ```
 
+---
+
+## Verification
+
+Run the core checks:
+
+```bash
+swift test
+```
+
+Build the local app bundle:
+
+```bash
+./scripts/build_app_bundle.sh
+```
+
+Smoke-test the release bundle:
+
+```bash
+./scripts/smoke_app_bundle.sh
+```
+
+---
+
+## Distribution Notes
+
+The default bundle script creates `output/KeyMood.app` and `output/KeyMood.zip`, then ad-hoc signs the app for local testing.
+
+Public macOS distribution should use Developer ID signing and Apple notarization:
+
+```bash
+KEYMOOD_SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" \
+KEYMOOD_NOTARIZE=1 \
+KEYMOOD_NOTARY_PROFILE="keymood-notary" \
+./scripts/build_app_bundle.sh
+```
+
+Check local distribution readiness:
+
+```bash
+./scripts/check_distribution_readiness.sh
+```
+
+Store a notary keychain profile before notarized builds:
+
+```bash
+./scripts/store_notary_profile.sh
+```
+
+AppleSPU raw sensor access is not a public App Store API. KeyMood is designed first as a local GitHub/Developer ID MacBook app.
+
+---
+
 ## Privacy Contract
 
-- No typed text is read.
-- No prompts, key names, or key codes are stored.
-- The probe measures AppleSPU accelerometer deltas from raw local reports.
-- The app infers mood from physical typing dynamics, not content.
+| KeyMood does | KeyMood does not do |
+|---|---|
+| Reads local accelerometer motion deltas | Read typed text |
+| Computes impact-g and smoothed energy | Store key names or key codes |
+| Maps physical force into character regimes | Send prompts or sensor data to a server |
+| Lets the user tune sensitivity locally | Use a hosted AI model |
+
+---
 
 ## License
 
